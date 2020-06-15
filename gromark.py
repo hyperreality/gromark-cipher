@@ -37,12 +37,17 @@ class Gronsfeld:
         return self.__encDec(ciphertext, -1)
 
 
-def trans_table(orig_key, alphabet=string.ascii_uppercase):
-    # Remove dups
+def key_remove_dups(orig_key):
     key = ""
     for i, k in enumerate(orig_key):
         if orig_key.index(k) == i:
             key += k
+    return key
+
+
+def trans_table(key, alphabet=string.ascii_uppercase):
+    # Remove dups
+    key = key_remove_dups(key)
 
     # Create x*x block of remaining letters of alphabet
     rest = "".join([c for c in alphabet if c not in key])
