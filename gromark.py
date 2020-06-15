@@ -2,14 +2,14 @@ import string
 
 
 class GronsfeldKey:
-  def __init__(self, primer):
-    self.primer = primer
-    self.i = 0
+    def __init__(self, primer):
+        self.primer = primer
+        self.i = 0
 
-  def __next__(self):
-    next_num = self.primer[self.i]
-    self.i = (self.i + 1) % len(self.primer)
-    return next_num
+    def __next__(self):
+        next_num = self.primer[self.i]
+        self.i = (self.i + 1) % len(self.primer)
+        return next_num
 
 
 class Gronsfeld:
@@ -24,7 +24,7 @@ class Gronsfeld:
         for i, char in enumerate(text):
             try:
                 alphIndex = (self.alphabet.index(char) +
-                         isEncrypt * next(self.key)) % len(self.alphabet)
+                             isEncrypt * next(self.key)) % len(self.alphabet)
                 ans += self.alphabet[alphIndex]
             except ValueError as e:
                 print(f"Can't find char {char} in alphabet, skipping")
@@ -67,13 +67,13 @@ def trans_table(orig_key, alphabet=string.ascii_uppercase):
 
 
 class GromarkKey:
-  def __init__(self, primer):
-    self.primer = primer
+    def __init__(self, primer):
+        self.primer = primer
 
-  def __next__(self):
-    next_num = (self.primer[0] + self.primer[1]) % 10
-    self.primer.append(next_num)
-    return self.primer.pop(0)
+    def __next__(self):
+        next_num = (self.primer[0] + self.primer[1]) % 10
+        self.primer.append(next_num)
+        return self.primer.pop(0)
 
 
 class Gromark:
@@ -88,29 +88,32 @@ class Gromark:
 
     def encrypt(self, plaintext):
         intermediate = self.gronsfeld.encrypt(plaintext)
-        translated = "".join([self.trans[self.alphabet.index(c)] for c in intermediate])
+        translated = "".join([self.trans[self.alphabet.index(c)]
+                              for c in intermediate])
         return translated
 
     def decrypt(self, ciphertext):
-        translated = "".join([self.alphabet[self.trans.index(c)] for c in ciphertext if c in self.alphabet])
+        translated = "".join([self.alphabet[self.trans.index(c)]
+                              for c in ciphertext if c in self.alphabet])
         return self.gronsfeld.decrypt(translated)
 
 
 class PeriodicGromarkKey:
-  def __init__(self, keyword, alphabet=string.ascii_uppercase):
-    self.trans, self.numerical_key = trans_table(keyword, alphabet)
-    self.key_shifts = [self.trans.index(k) for k in keyword]
-    self.primer = [n+1 for n in self.numerical_key]
-    self.i = 0
+    def __init__(self, keyword, alphabet=string.ascii_uppercase):
+        self.trans, self.numerical_key = trans_table(keyword, alphabet)
+        self.key_shifts = [self.trans.index(k) for k in keyword]
+        self.primer = [n+1 for n in self.numerical_key]
+        self.i = 0
 
-  def __next__(self):
-    next_num = (self.primer[0] + self.primer[1]) % 10
-    self.primer.append(next_num)
-    initial_shift = self.primer.pop(0)
+    def __next__(self):
+        next_num = (self.primer[0] + self.primer[1]) % 10
+        self.primer.append(next_num)
+        initial_shift = self.primer.pop(0)
 
-    periodic_shift = (self.i % (len(self.numerical_key)**2)) // len(self.numerical_key)
-    self.i += 1
-    return initial_shift + self.key_shifts[periodic_shift]
+        periodic_shift = (self.i % (len(self.numerical_key)**2)
+                          ) // len(self.numerical_key)
+        self.i += 1
+        return initial_shift + self.key_shifts[periodic_shift]
 
 
 class PeriodicGromark:
@@ -121,5 +124,3 @@ class PeriodicGromark:
             key_type=PeriodicGromarkKey,
             alphabet=alphabet,
         )
-
-

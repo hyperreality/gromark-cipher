@@ -1,6 +1,7 @@
 from gromark import *
 import unittest
 
+
 class TestBasic(unittest.TestCase):
     def test_gronsfeld(self):
         # Testcase from:
@@ -17,7 +18,8 @@ class TestBasic(unittest.TestCase):
         # Testcase from:
         # https://www.cryptogram.org/downloads/aca.info/ciphers/Gromark.pdf
         key = "ENIGMA"
-        self.assertEqual(trans_table(key), ("AJRXEBKSYGFPVIDOUMHQWNCLTZ", [1, 5, 3, 2, 4, 0]))
+        self.assertEqual(trans_table(
+            key), ("AJRXEBKSYGFPVIDOUMHQWNCLTZ", [1, 5, 3, 2, 4, 0]))
 
     def test_gromark(self):
         # Testcase from:
@@ -47,6 +49,3 @@ class TestBasic(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-
-
