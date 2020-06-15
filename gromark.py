@@ -96,6 +96,31 @@ class Gromark:
         return self.gronsfeld.decrypt(translated)
 
 
+class PeriodicGromarkKey:
+  def __init__(self, keyword, alphabet=string.ascii_uppercase):
+    self.trans, self.numerical_key = trans_table(keyword, alphabet)
+    self.key_shifts = [self.trans.index(k) for k in keyword]
+    self.primer = [n+1 for n in self.numerical_key]
+    self.i = 0
+
+  def __next__(self):
+    next_num = (self.primer[0] + self.primer[1]) % 10
+    self.primer.append(next_num)
+    initial_shift = self.primer.pop(0)
+
+    periodic_shift = (self.i % (len(self.numerical_key)**2)) // len(self.numerical_key)
+    self.i += 1
+    return initial_shift + self.key_shifts[periodic_shift]
+
+
+class PeriodicGromark:
+    def __new__(self, keyword, alphabet=string.ascii_uppercase):
+        return Gromark(
+            keyword=keyword,
+            primer=keyword,
+            key_type=PeriodicGromarkKey,
+            alphabet=alphabet,
+        )
 
 
 key = 9321492
@@ -123,4 +148,42 @@ assert test_gromark.trans == "AJRXEBKSYGFPVIDOUMHQWNCLTZ"
 encrypted = test_gromark.encrypt(decrypted)
 assert encrypted == ct
 
+
+key = "ENIGMA"
+ct = "RHNAAX NRUZBN IUARXC RTPATB RLIGDS VCIRCV OYPVRA AZZMUSREQYEV MMURGW TLUD"
+
+test_periodic_gromark = PeriodicGromark(key)
+decrypted = test_periodic_gromark.decrypt(ct)
+assert decrypted == "WINTRYSHOWERSWILLCONTINUEFORTHENEXTFEWDAYSACCORDINGTOTHEFORECAST"
+
+test_periodic_gromark = PeriodicGromark(key)
+encrypted = test_periodic_gromark.encrypt(decrypted)
+assert encrypted == ct.replace(' ', '')
+
+
+key = "AGENCY"
+ct = """BFPNU DXTEA IDDTK VDSSY NJCYC
+HETNS YDWVP ZWHBA FCMAN CDWOV
+IZJOB VTNLT NFPKM XIODY UMCJR
+XDPAZ QZFRB UXZLZ ZTLVD JJVAK
+EYMRT YTMHW XAMPX TWEKC WNSYH
+REYBG AZFRQ SMJNN XRBJM UVDZI
+CUFJX YIQSH JMXCV ABIDY SMQLN
+OPZGJ JFLUC SPPKS AYZMX OQYOS
+SNJLD CNJAM BLXYN BFLXC UAKOH
+HCBER IAWXE VXCGL BQONI LXWYA
+TYHMH GSOMF LEZMG EFCRQ TKWMF
+VWNGH XZZPX RWYWN NATZT GYAKV
+BKGLF BYBCZ IWOTK BEQJI LXONL
+TCYET BUDGJ FBTHT EVKCH XVEDX
+XPBXE NZEYG INKNM KYWXT XNEMO
+AOCRG XBGXQ XYWHQ IYXBO BEVDG
+ADNXT DFDYD GCFZN KGHHD WQKXY
+CFJII GSDJV FREIW QMNYP MXMKZ
+IZRBO BHDRB EASHY NXZXS GEHPE
+PMVLK WXEUU KAOMW OWJFD LBKHE"""
+
+test_periodic_gromark = PeriodicGromark(key)
+decrypted = test_periodic_gromark.decrypt(ct)
+print(decrypted)
 
